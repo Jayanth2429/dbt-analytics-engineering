@@ -1,0 +1,27 @@
+version: 2
+
+sources:
+  - name: cms
+    description: >-
+      Current public CMS Provider Data Catalog files downloaded at runtime and
+      loaded into DuckDB by scripts/load_raw_duckdb.py.
+    schema: raw
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 2, period: day}
+    tables:
+      - name: hospital_general
+        description: CMS Hospital General Information.
+        columns:
+          - name: facility_id
+            tests: [not_null, unique]
+      - name: readmissions
+        description: CMS Hospital Readmissions Reduction Program hospital-level measures.
+        columns:
+          - name: facility_id
+            tests: [not_null]
+      - name: timely_care
+        description: CMS Timely and Effective Care hospital-level measures.
+        columns:
+          - name: facility_id
+            tests: [not_null]

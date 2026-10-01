@@ -1,0 +1,67 @@
+version: 2
+
+models:
+  - name: dim_hospital
+    description: Hospital dimension sourced from CMS Hospital General Information.
+    columns:
+      - name: facility_id
+        tests: [not_null, unique]
+
+  - name: dim_measure
+    description: Unified measure dimension for readmission and timely-care measures.
+    columns:
+      - name: measure_key
+        tests: [not_null, unique]
+      - name: measure_domain
+        tests:
+          - accepted_values:
+              values: ['READMISSION', 'TIMELY_CARE']
+
+  - name: fct_readmissions
+    description: HRRP fact table at hospital, measure, and reporting-period grain.
+    columns:
+      - name: readmission_fact_key
+        tests: [not_null, unique]
+      - name: facility_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hospital')
+              field: facility_id
+      - name: measure_key
+        tests:
+          - relationships:
+              to: ref('dim_measure')
+              field: measure_key
+
+  - name: fct_timely_care
+    description: Timely and Effective Care fact table at hospital, measure, and reporting-period grain.
+    columns:
+      - name: timely_care_fact_key
+        tests: [not_null, unique]
+      - name: facility_id
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_hospital')
+              field: facility_id
+      - name: measure_key
+        tests:
+          - relationships:
+              to: ref('dim_measure')
+              field: measure_key
+
+  - name: mart_hospital_quality_snapshot
+    description: Recruiter-friendly hospital-level analytical mart joining hospital attributes and measure coverage.
+    columns:
+      - name: facility_id
+        tests: [not_null, unique]
+
+  - name: mart_state_hospital_profile
+    description: State-level hospital profile for dashboarding and exploratory analysis.
+    columns:
+      - name: state
+        tests: [not_null, unique]
+
+  - name: mart_readmission_benchmark
+    description: State-by-measure HRRP benchmark mart based on reported excess readmission ratios.

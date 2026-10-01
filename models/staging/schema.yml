@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: stg_hospitals
+    description: One cleaned row per Medicare-registered hospital in the CMS general-information file.
+    columns:
+      - name: facility_id
+        description: CMS Certification Number retained as text so leading zeroes are preserved.
+        tests: [not_null, unique]
+      - name: state
+        tests: [not_null]
+      - name: hospital_overall_rating
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4, 5]
+              quote: false
+
+  - name: stg_readmissions
+    description: Cleaned HRRP measures at hospital, measure, and reporting-period grain.
+    columns:
+      - name: facility_id
+        tests: [not_null]
+      - name: measure_id
+        tests: [not_null]
+
+  - name: stg_timely_care
+    description: Cleaned hospital-level Timely and Effective Care measures.
+    columns:
+      - name: facility_id
+        tests: [not_null]
+      - name: measure_id
+        tests: [not_null]

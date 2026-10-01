@@ -1,0 +1,21 @@
+name: cms_hospital_analytics
+version: '1.0.0'
+config-version: 2
+
+profile: cms_hospital_analytics
+
+model-paths: ["models"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+analysis-paths: ["analyses"]
+target-path: "target"
+clean-targets: ["target", "dbt_packages", "logs"]
+
+models:
+  cms_hospital_analytics:
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+      +materialized: table

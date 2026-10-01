@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  dbt-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Unit tests
+        run: python -m pytest -q tests/test_download_helpers.py tests/test_project_structure.py
+
+      - name: Download public CMS data
+        run: python scripts/download_cms_data.py
+
+      - name: Load raw DuckDB layer
+        run: python scripts/load_raw_duckdb.py
+
+      - name: dbt debug
+        run: dbt debug --profiles-dir .
+
+      - name: dbt build
+        run: dbt build --profiles-dir .
